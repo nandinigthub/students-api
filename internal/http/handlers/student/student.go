@@ -21,7 +21,7 @@ var stu models.Student
 func Home() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Info("Home page of student api")
-		err := response.WriteJson(w, http.StatusOK, stu)
+		err := response.WriteJson(w, http.StatusOK, "this is home page of students api")
 		if err != nil {
 			response.WriteJson(w, http.StatusBadGateway, response.ErrorMessage(err))
 			return
@@ -32,7 +32,7 @@ func Home() http.HandlerFunc {
 // adding new student
 func New(s models.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		slog.Info("creating student")
+		slog.Info("creating student table")
 
 		err := json.NewDecoder(r.Body).Decode(&stu)
 		if errors.Is(err, io.EOF) {
@@ -93,6 +93,7 @@ func GetstudentbyId(s models.Storage) http.HandlerFunc {
 	}
 }
 
+// get all student
 func GetallStudent(s models.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Info("getting all students")
@@ -104,6 +105,29 @@ func GetallStudent(s models.Storage) http.HandlerFunc {
 		}
 
 		response.WriteJson(w, http.StatusOK, students)
+
+	}
+}
+
+// delete student by id
+func DeletestudentbyId(s models.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.PathValue("id")
+		slog.Info("deleting student", slog.String("id", id))
+
+		intId, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			response.WriteJson(w, http.StatusBadRequest, response.ErrorMessage(err))
+			return
+		}
+
+		deletedStudent, err := s.DeletestudentbyId(intId)
+		if err != nil {
+			response.WriteJson(w, http.StatusInternalServerError, response.ErrorMessage(err))
+			return
+		}
+
+		response.WriteJson(w, http.StatusOK, fmt.Sprint("deleted Student:\n", deletedStudent))
 
 	}
 }

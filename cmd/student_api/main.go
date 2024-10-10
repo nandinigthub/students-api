@@ -34,10 +34,11 @@ func main() {
 	r := http.NewServeMux()
 
 	// Define a handler for the root endpoint
-	r.HandleFunc("GET /api/student", student.Home())                     // http://localhost:8080/api/student
-	r.HandleFunc("POST /api/student/create", student.New(store))         // http://localhost:8080/api/student/create
-	r.HandleFunc("GET /api/student/{id}", student.GetstudentbyId(store)) // http://localhost:8080/api/student/{id}
-	r.HandleFunc("GET /api/student/all", student.GetallStudent(store))   // http://localhost:8080/api/student/all
+	r.HandleFunc("GET /api/student", student.Home())                                  // http://localhost:8080/api/student
+	r.HandleFunc("POST /api/student/create", student.New(store))                      // http://localhost:8080/api/student/create
+	r.HandleFunc("GET /api/student/{id}", student.GetstudentbyId(store))              // http://localhost:8080/api/student/{id}
+	r.HandleFunc("GET /api/student/all", student.GetallStudent(store))                // http://localhost:8080/api/student/all
+	r.HandleFunc("DELETE /api/student/delete/{id}", student.DeletestudentbyId(store)) // http://localhost:8080/api/student/delete
 
 	// Setup server
 

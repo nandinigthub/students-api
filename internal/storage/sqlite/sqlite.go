@@ -119,3 +119,28 @@ func (s *sqlite) GetallStudent() ([]models.Student, error) {
 	return stu, nil
 
 }
+
+// delete student by id
+func (s *sqlite) DeletestudentbyId(id int64) (models.Student, error) {
+
+	// First, retrieve the student to be deleted
+	student, err := s.GetstudentbyId(id)
+	if err != nil {
+		return models.Student{}, fmt.Errorf("failed to get student before deletion: %s", err)
+	}
+
+	// Prepare the delete statement
+	stmt, err := s.Db.Prepare("DELETE FROM students WHERE id = ?")
+	if err != nil {
+		return models.Student{}, fmt.Errorf("failed to prepare delete statement: %s", err)
+	}
+	defer stmt.Close()
+
+	// Execute the delete statement
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return models.Student{}, fmt.Errorf("failed to execute delete statement: %s", err)
+	}
+
+	return student, nil
+}
