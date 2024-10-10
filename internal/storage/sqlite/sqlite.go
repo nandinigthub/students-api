@@ -84,3 +84,38 @@ func (s *sqlite) GetstudentbyId(id int64) (models.Student, error) {
 	return stu, nil
 
 }
+
+// get all students
+func (s *sqlite) GetallStudent() ([]models.Student, error) {
+	slog.Info("getting all student")
+
+	stmt, err := s.Db.Prepare("SELECT * FROM students")
+	if err != nil {
+		return nil, err
+	}
+
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var stu []models.Student
+
+	for rows.Next() {
+		var student models.Student
+
+		err := rows.Scan(&student.Id, &student.Name, &student.Email, &student.Age)
+		if err != nil {
+			return nil, err
+		}
+
+		stu = append(stu, student)
+
+	}
+	return stu, nil
+
+}

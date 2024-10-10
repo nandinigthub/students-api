@@ -74,16 +74,6 @@ func New(s models.Storage) http.HandlerFunc {
 func GetstudentbyId(s models.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
-		// parts := strings.Split(r.URL.Path, "/")
-
-		// // Check if the URL contains at least 3 parts (like /students/{id})
-		// if len(parts) < 3 {
-		// 	http.Error(w, "Invalid request path", http.StatusBadRequest)
-		// 	return
-		// }
-
-		// // Extract the id from the last part of the URL
-		// id := parts[len(parts)-1]
 		slog.Info("getting student by", slog.String("id", id))
 
 		intId, err := strconv.ParseInt(id, 10, 64)
@@ -100,5 +90,20 @@ func GetstudentbyId(s models.Storage) http.HandlerFunc {
 		}
 
 		response.WriteJson(w, http.StatusOK, student)
+	}
+}
+
+func GetallStudent(s models.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		slog.Info("getting all students")
+
+		students, err := s.GetallStudent()
+		if err != nil {
+			response.WriteJson(w, http.StatusInternalServerError, response.ErrorMessage(err))
+			return
+		}
+
+		response.WriteJson(w, http.StatusOK, students)
+
 	}
 }
