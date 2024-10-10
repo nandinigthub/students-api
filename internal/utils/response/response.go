@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator"
-	"github.com/nandinigthub/students-api/internal/models"
+	"github.com/nandinigthub/students-api/models"
 )
 
 const (

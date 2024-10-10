@@ -2,9 +2,11 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
+	"log/slog"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/nandinigthub/students-api/internal/models"
+	"github.com/nandinigthub/students-api/models"
 )
 
 type sqlite struct {
@@ -36,7 +38,6 @@ func New(cfg *models.Config) (*sqlite, error) {
 }
 
 // create student db
-
 func (s *sqlite) CreateStudent(name string, email string, age int) (int64, error) {
 
 	stmt, err := s.Db.Prepare("INSERT INTO students(name,email,age)VALUES (?,?,?)")
@@ -55,4 +56,31 @@ func (s *sqlite) CreateStudent(name string, email string, age int) (int64, error
 	}
 
 	return lastid, nil
+}
+
+// get student by id
+func (s *sqlite) GetstudentbyId(id int64) (models.Student, error) {
+
+	slog.Info("getting student by id")
+	stmt, err := s.Db.Prepare("SELECT * FROM students WHERE id == ? LIMIT 1 ")
+	if err != nil {
+		return models.Student{}, err
+	}
+
+	defer stmt.Close()
+
+	var stu models.Student
+
+	err = stmt.QueryRow(id).Scan(&stu.Id, &stu.Name, &stu.Email, &stu.Age)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.Student{}, fmt.Errorf("no student with this id %s", fmt.Sprint(id))
+		}
+
+		return models.Student{}, fmt.Errorf("query error: %w", err)
+	}
+
+	return stu, nil
+
 }

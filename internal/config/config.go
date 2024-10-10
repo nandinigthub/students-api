@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/nandinigthub/students-api/internal/models"
+	"github.com/nandinigthub/students-api/models"
 )
 
 // MustLoad reads the configuration from a file or environment variables
