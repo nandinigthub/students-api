@@ -12,19 +12,28 @@ import (
 	"time"
 
 	"github.com/nandinigthub/students-api/internal/config"
+	"github.com/nandinigthub/students-api/internal/http/handlers/student"
+	"github.com/nandinigthub/students-api/internal/storage/sqlite"
 )
 
 func main() {
 	// Load configuration
 	cfg := config.MustLoad()
 
+	// database setup
+	store, err := sqlite.New(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	slog.Info("storage initialized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
+
 	// Setup router
 	r := http.NewServeMux()
 
 	// Define a handler for the root endpoint
-	r.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Home page of students API"))
-	})
+	r.HandleFunc("GET /api/student", student.Home())             // http://localhost:3000/api/student
+	r.HandleFunc("POST /api/student/create", student.New(store)) // http://localhost:3000/api/student/create
 
 	// Setup server
 
@@ -34,7 +43,8 @@ func main() {
 	}
 
 	// Log server start message
-	fmt.Println(cfg.Addr)
+	// fmt.Println(cfg.Addr)
+	slog.Info("server started", slog.String("address", cfg.Addr))
 	fmt.Printf("Server started successfully, running at %s", cfg.HTTPServer.Addr)
 
 	// graceful close/ shutdown
@@ -57,7 +67,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	err := server.Shutdown(ctx) // takes too much time, it may hang infinitly therefore we use context package
+	err = server.Shutdown(ctx) // takes too much time, it may hang infinitly therefore we use context package
 
 	if err != nil {
 		slog.Error("failed to shutdown", slog.String("error", err.Error()))

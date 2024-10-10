@@ -6,22 +6,11 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/nandinigthub/students-api/internal/models"
 )
 
-type HTTPServer struct {
-	Addr string `yaml:"address" env-required:"true"`
-}
-
-// Config struct represents the configuration for the application
-// env-default:"production"
-type Config struct {
-	Env         string `yaml:"env" env:"ENV" env-required:"true"`
-	StoragePath string `yaml:"storage_path" env-required:"true"`
-	HTTPServer  `yaml:"http_server"`
-}
-
 // MustLoad reads the configuration from a file or environment variables
-func MustLoad() *Config {
+func MustLoad() *models.Config {
 	var configPath string
 
 	// Check for CONFIG_PATH environment variable
@@ -42,7 +31,7 @@ func MustLoad() *Config {
 		log.Fatalf("config file does not exist: %s", configPath)
 	}
 
-	var cfg Config
+	var cfg models.Config
 
 	// Read the configuration from the file
 	err := cleanenv.ReadConfig(configPath, &cfg)
